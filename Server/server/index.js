@@ -1,4 +1,9 @@
 import Hapi from '@hapi/hapi';
+import Inert from '@hapi/inert';
+import Vision from '@hapi/vision';
+import HapiSwagger from 'hapi-swagger';
+import todoListHandlers from './api/todoListHandlers.js';
+import todoListValidators from './api/validators/todoListValidators.js';
 
 const init = async () => {
 
@@ -7,12 +12,75 @@ const init = async () => {
         host: 'localhost'
     });
 
+    await server.register([
+        Inert,
+        Vision,
+        {
+            plugin: HapiSwagger,
+            options: {
+                info: {
+                    title: 'Test API Documentation',
+                    version: '1.0.0'
+                },
+                documentationPath: '/docs'
+            }
+        }
+    ]);
+
     server.route({
         method: 'GET',
-        path: '/',
-        handler: (request, h) => {
+        path: '/todos',
+        handler: todoListHandlers.getTodos,
+        options: {
+            description: 'Get todo',
+            notes: 'Returns a todo item by the id passed in the path',
+            tags: ['api'],
+            validate: {
+                query: todoListValidators.queryGetTodos
+            }
+        }
+    });
 
-            return 'Hello World!';
+    server.route({
+        method: 'POST',
+        path: '/todos',
+        handler: todoListHandlers.postTodo,
+        options: {
+            description: 'Post todo',
+            notes: 'Returns a todo item by the id passed in the path',
+            tags: ['api'],
+            validate: {
+                payload: todoListValidators.payloadPostTodos
+            }
+        }
+    });
+
+    server.route({
+        method: 'PATCH',
+        path: '/todo/{id}',
+        handler: todoListHandlers.patchTodo,
+        options: {
+            description: 'Patch todo',
+            notes: 'Returns a todo item by the id passed in the path',
+            tags: ['api'],
+            validate: {
+                params: todoListValidators.paramsPatchTodos,
+                payload: todoListValidators.payloadPatchTodos
+            }
+        }
+    });
+
+    server.route({
+        method: 'DELETE',
+        path: '/todo/{id}',
+        handler: todoListHandlers.deleteTodo,
+        options: {
+            description: 'Delete todo',
+            notes: 'Returns a todo item by the id passed in the path',
+            tags: ['api'],
+            validate: {
+                params: todoListValidators.paramsDeleteTodos
+            }
         }
     });
 
