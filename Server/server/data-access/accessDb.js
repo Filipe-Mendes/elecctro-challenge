@@ -6,7 +6,12 @@ const readTodo = async function (id) {
         const todoList = await knexConnection.select('*')
             .from('todo')
             .where('id', id);
-        return todoList;
+        if (todoList.length === 0) {
+            return null;
+        }
+
+        delete todoList[0].username;
+        return todoList[0];
     }
     catch (err) {
         return null;
@@ -22,6 +27,7 @@ const readTodos = async function (filter, orderBy) {
             .whereIn('state', filter)
             .orderBy(orderBy);
 
+        todoLists.forEach((todo) => delete todo.username);
         return todoLists;
     }
     catch (err) {
@@ -32,8 +38,12 @@ const readTodos = async function (filter, orderBy) {
 const createTodo = async function (todo) {
 
     try {
-        const res = await knexConnection.insert(todo, ['id']).into('todo');
-        return res;
+        const res = await knexConnection.insert(todo, 'id').into('todo');
+        if (res === null) {
+            return null;
+        }
+
+        return res[0].id;
     }
     catch (err) {
         return null;
@@ -46,10 +56,15 @@ const editTodo = async function (id, body) {
         const edited = await knexConnection('todo')
             .update(body)
             .where('id', id);
-        return edited;
+
+        if (edited === 1) {
+            return true;
+        }
+
+        return false;
     }
     catch (err) {
-        return null;
+        return false;
     }
 };
 
@@ -62,10 +77,14 @@ const deleteTodo = async function (id) {
         const deleted = await knexConnection.from('todo')
             .where('id', id)
             .del();
-        return deleted;
+        if (deleted === 1) {
+            return true;
+        }
+
+        return false;
     }
     catch (err) {
-        return null;
+        return false;
     }
 };
 

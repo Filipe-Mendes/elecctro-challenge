@@ -32,8 +32,8 @@ const init = async () => {
         path: '/todos',
         handler: todoListHandlers.getTodos,
         options: {
-            description: 'Get todo',
-            notes: 'Returns a todo item by the id passed in the path',
+            description: 'Get to-do lists',
+            notes: 'Lists the to-do lists considering the conditions imposed on the query parameters',
             tags: ['api'],
             validate: {
                 query: todoListValidators.queryGetTodos
@@ -46,8 +46,8 @@ const init = async () => {
         path: '/todos',
         handler: todoListHandlers.postTodo,
         options: {
-            description: 'Post todo',
-            notes: 'Returns a todo item by the id passed in the path',
+            description: 'Create to-do list',
+            notes: 'Creates a to-do list with the provided description',
             tags: ['api'],
             validate: {
                 payload: todoListValidators.payloadPostTodos
@@ -60,8 +60,8 @@ const init = async () => {
         path: '/todo/{id}',
         handler: todoListHandlers.patchTodo,
         options: {
-            description: 'Patch todo',
-            notes: 'Returns a todo item by the id passed in the path',
+            description: 'Edit to-do list',
+            notes: 'Edits to-do list, changing the provided fields',
             tags: ['api'],
             validate: {
                 params: todoListValidators.paramsPatchTodos,
@@ -75,8 +75,8 @@ const init = async () => {
         path: '/todo/{id}',
         handler: todoListHandlers.deleteTodo,
         options: {
-            description: 'Delete todo',
-            notes: 'Returns a todo item by the id passed in the path',
+            description: 'Delete to-do list',
+            notes: 'Deletes to-do list with the specified id',
             tags: ['api'],
             validate: {
                 params: todoListValidators.paramsDeleteTodos

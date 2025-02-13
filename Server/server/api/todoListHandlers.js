@@ -1,6 +1,7 @@
 import db from '../data-access/accessDb.js';
 import STATE from '../state.js';
 import ORDER from '../order.js';
+import HTTP_STATUS_CODE from '../api/httpStatusCodes.js';
 
 const getTodos = async function (request, reply) {
 
@@ -15,8 +16,7 @@ const getTodos = async function (request, reply) {
     const orderBy = request.query.orderBy ? ORDER[request.query.orderBy] : ORDER.CREATED_AT;
 
     const res = await db.readTodos(filter, orderBy);
-    res.forEach((todo) => delete todo.username);
-    return res;
+    return reply.response(res).code(HTTP_STATUS_CODE.OK);
 };
 
 // id - attributed by the database
@@ -29,49 +29,54 @@ const postTodo = async function (request, reply) {
     const todo = request.payload;
     todo.state = STATE.INCOMPLETE;
     todo.createdAt = new Date().toISOString();
-    const res = await db.createTodo(todo);
-    return res;
+    const id = await db.createTodo(todo);
+
+    if (id === null) {
+        reply.response({ error: 'Error creating to-do list' }).code(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    }
+
+    const res = await db.readTodo(id);
+    return reply.response(res).code(HTTP_STATUS_CODE.CREATED);
 };
 
 const patchTodo = async function (request, reply) {
 
-    //CHECK IF ITS INCOMPLETE FIRST
     const id = request.params.id;
     const todoList = await db.readTodo(id);
 
     if (todoList === null) {
-        //ID DOESN'T EXIST, RETURN 404
-        return null;
+        return reply.response({ error: 'This to-do list does not exist' }).code(HTTP_STATUS_CODE.NOT_FOUND);
     }
 
     if (todoList.state !== STATE.INCOMPLETE) {
-        //TODO LIST CANNOT BE CHANGED, RETURN 400
-        return null;
+        return reply.response({ error: 'To-do list is not INCOMPLETE, cannot be changed' }).code(HTTP_STATUS_CODE.BAD_REQUEST);
     }
 
     const body = request.payload;
     const edited = await db.editTodo(id, body);
-    //CHECK IF EDITED IS AN ERROR
+    if (edited === false) {
+        reply.response({ error: 'Error editing to-do list' }).code(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    }
+
     const res = await db.readTodo(id);
-    return res;
+    return reply.response(res).code(HTTP_STATUS_CODE.OK);
 };
 
 const deleteTodo = async function (request, reply) {
 
-    //CHECK IF IT EXISTS FIRST
     const id = request.params.id;
 
     const todoList = await db.readTodo(id);
     if (todoList === null) {
-        //ID DOESN'T EXIST, RETURN 404
-        return null;
+        return reply.response({ error: 'This to-do list does not exist' }).code(HTTP_STATUS_CODE.NOT_FOUND);
     }
 
-    const res = await db.deleteTodo(id);
-    //if res = 1 deleted
-    //if res = 0 404
-    //RETURN EMPTY RESPONSE
-    return {};
+    const deleted = await db.deleteTodo(id);
+    if (deleted === false) {
+        reply.response({ error: 'Error deleting to-do list' }).code(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
+    }
+
+    return reply.response({}).code(HTTP_STATUS_CODE.OK);
 };
 
 export default {
