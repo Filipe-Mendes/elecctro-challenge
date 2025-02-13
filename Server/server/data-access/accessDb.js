@@ -16,10 +16,12 @@ const readTodo = async function (id) {
 const readTodos = async function (filter, orderBy) {
 
     try {
+
         const todoLists = await knexConnection.select('*')
             .from('todo')
-            .where(filter)
+            .whereIn('state', filter)
             .orderBy(orderBy);
+
         return todoLists;
     }
     catch (err) {
