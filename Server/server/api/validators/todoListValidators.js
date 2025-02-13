@@ -2,19 +2,19 @@ import Joi from 'joi';
 import STATE from '../../state.js';
 import ORDER from '../../order.js';
 
-//TODO: CHECK EMPTY RESPONSES
-
 //INPUT VALIDATORS
 const idJoi = Joi.number().integer();
 const stateJoi = Joi.string().valid(...Object.values(STATE));
 const descriptionJoi = Joi.string().min(0).max(255);
-//TODO: CHECK DATES FORMAT
-const createdAtJoi = Joi.date().timestamp();
-const completedAtJoi = Joi.date().timestamp();//CHECK IF NULL IS ALLOWED
-
+const createdAtJoi = Joi.date().iso();
+const completedAtJoi = Joi.alternatives().try(
+    Joi.date().iso().required(),
+    Joi.valid(null).required()
+);
 const filterJoi = Joi.string().valid(...Object.keys(STATE));
 const orderByJoi = Joi.string().valid(...Object.keys(ORDER));
 
+const emptyJoi = Joi.object({});
 
 //POST /TODOS
 //PAYLOAD
@@ -51,20 +51,20 @@ const responseGetTodos = Joi.array().items(
 );
 
 
-//PATCH /TODOS/{id}
+//PATCH /TODO/{id}
 //PARAMS
 const paramsPatchTodos = Joi.object({
     id: idJoi.required()
 });
 
 //PAYLOAD
-const payloadPatchTodos = Joi.object({
+const payloadPatchTodo = Joi.object({
     state: stateJoi,
     description: descriptionJoi
 }).or('state', 'description');
 
 //RESPONSE
-const responsePatchTodos = Joi.object({
+const responsePatchTodo = Joi.object({
     id: idJoi.required(),
     state: stateJoi.required(),
     description: descriptionJoi.required(),
@@ -72,11 +72,14 @@ const responsePatchTodos = Joi.object({
     completedAt: completedAtJoi.required()
 });
 
-//DELETE /TODOS/{id}
+//DELETE /TODO/{id}
 //PARAMS
-const paramsDeleteTodos = Joi.object({
+const paramsDeleteTodo = Joi.object({
     id: idJoi.required()
 });
+
+//RESPONSE
+const responseDeleteTodo = emptyJoi;
 
 export default {
     payloadPostTodos,
@@ -84,7 +87,8 @@ export default {
     queryGetTodos,
     responseGetTodos,
     paramsPatchTodos,
-    payloadPatchTodos,
-    responsePatchTodos,
-    paramsDeleteTodos
+    payloadPatchTodo,
+    responsePatchTodo,
+    paramsDeleteTodo,
+    responseDeleteTodo
 };

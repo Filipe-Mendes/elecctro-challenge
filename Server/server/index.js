@@ -37,6 +37,10 @@ const init = async () => {
             tags: ['api'],
             validate: {
                 query: todoListValidators.queryGetTodos
+            },
+            response: {
+                schema: todoListValidators.responseGetTodos,
+                failAction: 'error'
             }
         }
     });
@@ -51,6 +55,10 @@ const init = async () => {
             tags: ['api'],
             validate: {
                 payload: todoListValidators.payloadPostTodos
+            },
+            response: {
+                schema: todoListValidators.responsePostTodos,
+                failAction: 'error'
             }
         }
     });
@@ -64,8 +72,12 @@ const init = async () => {
             notes: 'Edits to-do list, changing the provided fields',
             tags: ['api'],
             validate: {
-                params: todoListValidators.paramsPatchTodos,
-                payload: todoListValidators.payloadPatchTodos
+                params: todoListValidators.paramsPatchTodo,
+                payload: todoListValidators.payloadPatchTodo
+            },
+            response: {
+                schema: todoListValidators.responsePatchTodos,
+                failAction: 'error'
             }
         }
     });
@@ -79,7 +91,11 @@ const init = async () => {
             notes: 'Deletes to-do list with the specified id',
             tags: ['api'],
             validate: {
-                params: todoListValidators.paramsDeleteTodos
+                params: todoListValidators.paramsDeleteTodo
+            },
+            response: {
+                schema: todoListValidators.responseDeleteTodo,
+                failAction: 'error'
             }
         }
     });
