@@ -2,14 +2,21 @@ import Hapi from '@hapi/hapi';
 import Inert from '@hapi/inert';
 import Vision from '@hapi/vision';
 import HapiSwagger from 'hapi-swagger';
-import todoListHandlers from './api/todoListHandlers.js';
+import todoListHandlers from './api/handlers/todoListHandlers.js';
 import todoListValidators from './api/validators/todoListValidators.js';
 
 const init = async () => {
 
     const server = Hapi.server({
         port: 3000,
-        host: 'localhost'
+        host: 'localhost',
+        routes: {
+            cors: {
+                origin: ['*'],
+                headers: ['Accept', 'Content-Type', 'Authorization'],
+                credentials: true
+            }
+        }
     });
 
     await server.register([

@@ -1,7 +1,7 @@
-import db from '../data-access/accessDb.js';
-import STATE from '../state.js';
-import ORDER from '../order.js';
-import HTTP_STATUS_CODE from '../api/httpStatusCodes.js';
+import db from '../../data-access/accessDb.js';
+import STATE from '../../state.js';
+import ORDER from '../../order.js';
+import HTTP_STATUS_CODE from '../httpStatusCodes.js';
 
 const getTodos = async function (request, reply) {
 
@@ -48,11 +48,11 @@ const patchTodo = async function (request, reply) {
         return reply.response({ error: 'This to-do list does not exist' }).code(HTTP_STATUS_CODE.NOT_FOUND);
     }
 
-    if (todoList.state !== STATE.INCOMPLETE) {
-        return reply.response({ error: 'To-do list is not INCOMPLETE, cannot be changed' }).code(HTTP_STATUS_CODE.BAD_REQUEST);
+    const body = request.payload;
+    if (todoList.state === STATE.COMPLETE && body.description !== null && body.description !== undefined) {
+        return reply.response({ error: 'To-do list is not INCOMPLETE, description cannot be changed' }).code(HTTP_STATUS_CODE.BAD_REQUEST);
     }
 
-    const body = request.payload;
     const edited = await db.editTodo(id, body);
     if (edited === false) {
         reply.response({ error: 'Error editing to-do list' }).code(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);
