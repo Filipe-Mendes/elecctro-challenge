@@ -6,7 +6,7 @@ import { TodoContext } from '../Context';
 export default function TodoForm() {
     const [description, setDescription] = useState('');
 
-    const { todo, setTodo } = useContext(TodoContext);
+    const { setTodo } = useContext(TodoContext);
 
     async function createTodo(event) {
         event.preventDefault();
