@@ -14,6 +14,7 @@ const readTodo = async function (id) {
         return todoList[0];
     }
     catch (err) {
+        console.log(err);
         return null;
     }
 };
@@ -31,6 +32,7 @@ const readTodos = async function (filter, orderBy) {
         return todoLists;
     }
     catch (err) {
+        console.log(err);
         return null;
     }
 };
@@ -46,6 +48,7 @@ const createTodo = async function (todo) {
         return res[0].id;
     }
     catch (err) {
+        console.log(err);
         return null;
     }
 };
@@ -64,6 +67,7 @@ const editTodo = async function (id, body) {
         return false;
     }
     catch (err) {
+        console.log(err);
         return false;
     }
 };
@@ -84,6 +88,7 @@ const deleteTodo = async function (id) {
         return false;
     }
     catch (err) {
+        console.log(err);
         return false;
     }
 };

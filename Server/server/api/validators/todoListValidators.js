@@ -4,7 +4,7 @@ import ORDER from '../../order.js';
 
 //INPUT VALIDATORS
 const idJoi = Joi.number().integer();
-const stateJoi = Joi.string().valid(...Object.values(STATE).filter(state => state !== STATE.ALL));
+const stateJoi = Joi.string().valid(...Object.values(STATE).filter((state) => state !== STATE.ALL));
 const descriptionJoi = Joi.string().min(0).max(255);
 const createdAtJoi = Joi.date().iso();
 const completedAtJoi = Joi.alternatives().try(
