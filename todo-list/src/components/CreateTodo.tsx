@@ -1,10 +1,15 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import axios from 'axios'
-import './App.css'
+import '../App.css'
+import { TodoContext } from '../Context';
 
 export default function TodoForm() {
     const [description, setDescription] = useState('');
 
+    const { todo, setTodo } = useContext(TodoContext);
+    const [newTodo, setNewTodo] = useState('');
+
+    
 
     async function createTodo(event) {
         event.preventDefault();
@@ -16,6 +21,7 @@ export default function TodoForm() {
             })
             // alert('Todo created!');
             setDescription('')
+            setTodo([res])
         } catch (error) {
             alert('Failed to create todo');
         }

@@ -1,19 +1,25 @@
 import axios from 'axios'
-import './App.css'
-import { useEffect, useState } from 'react';
+import '../App.css'
+import { useContext, useEffect, useState } from 'react';
 import { Todo } from '../model/Todo.tsx';
 import STATE from '../model/state.tsx';
 import ORDER from '../model/order.tsx';
+import { TodoContext } from '../Context.tsx';
 
 export default function TodoList() {
     const [hidden, setHidden] = useState(false);
     const [todos, setTodos] = useState([]);
     const [description, setDescription] = useState('');
-    const [editDes, setEditDesc] = useState(false);
+
     const DEFAULT_ID = -1;
+    const [editDes, setEditDesc] = useState(false);
     const [editId, setEditId] = useState(DEFAULT_ID);
+
     const MAX_ORDERS = 3;
     const [order, setOrder] = useState(0);
+    const orderValues = Object.values(ORDER);
+
+    const { todo, setTodo } = useContext(TodoContext);
 
 
     async function getTodos() {
@@ -33,10 +39,27 @@ export default function TodoList() {
             alert('Failed to list todos');
         }
     }
+
+    function updateFromLocalStorage() {
+        const h = localStorage.getItem("hidden")
+        const hv = h ? h === "true" : false
+        setHidden(hv)
+
+        const o = localStorage.getItem("order")
+        setOrder(o ? parseInt(o) : 0);
+
+
+    }
     useEffect(() => {
         console.log("USE EFFECT")
         getTodos()
+        updateFromLocalStorage()
     }, [])
+
+    useEffect(() => {
+        console.log("USE EFFECT POST CREATED")
+        getTodos()
+    }, [todo])
 
     async function deleteTodo(id: number) {
         console.log("DELETE TODO")
@@ -91,12 +114,17 @@ export default function TodoList() {
     }
 
     function handleOrder() {
-        if (order < MAX_ORDERS - 1) setOrder(order + 1)
-        else setOrder(0)
-        console.log(order)
+        let newOrder
+        if (order < MAX_ORDERS - 1) newOrder = order + 1
+        else newOrder = 0
+
+        setOrder(newOrder)
+        localStorage.setItem("order", newOrder.toString())
+
     }
 
     function sortFuction(a: Todo, b: Todo) {
+        console.log("sort: " + order)
         switch (order) {
             case ORDER.DESCRIPTION_AZ:
                 return a.description.localeCompare(b.description);
@@ -112,34 +140,34 @@ export default function TodoList() {
             <h2>
                 <span onClick={() => handleOrder()}>Tasks</span>
             </h2>
+            <p>({orderValues[order]})</p>
             {todos
-                .filter((todo: Todo) => {
-                    if (hidden) {
-                        return todo.state !== STATE.COMPLETE;
-                    } else {
-                        return true;
-                    }
-                })
-                .sort((a, b) => (sortFuction(a, b)))
+                .filter((todo: Todo) => { return hidden ? todo.state !== STATE.COMPLETE : true }) // Shows all or only incomplete tasks according to hidden's value 
+                .sort((a, b) => (sortFuction(a, b))) // Sorts tasks according to order value
                 .map((todo: Todo) => {
                     console.log("map : " + todo.id)
                     return <div key={todo.id}>
-                        <input type="checkbox" id={"complete" + todo.id} name="complete"
-                            checked={todo.state == STATE.COMPLETE}
-                            onChange={() => { changeState(todo.id, todo.state); }}
-                        />
+
+                        <label className="container">
+                            <input type="checkbox" id={"complete" + todo.id} name="complete"
+                                checked={todo.state == STATE.COMPLETE}
+                                onChange={() => { changeState(todo.id, todo.state); }}
+                            />
+                            <span className="checkmark"></span>
+                        </label>
+
 
                         {todo.description}
 
-                        <button onClick={() => { editTodo(todo.id); }} disabled={todo.state == STATE.COMPLETE ? true : false}>
+                        <button onClick={() => { editTodo(todo.id); }} disabled={todo.state == STATE.COMPLETE ? true : false} className='button-edit'>
                             Edit
                         </button>
 
-                        <button onClick={() => { deleteTodo(todo.id); }}>
+                        <button onClick={() => { deleteTodo(todo.id); }} className='button-delete'>
                             Delete
                         </button>
 
-                        {(editDes && todo.id == editId) ?
+                        {(editDes && todo.id == editId && todo.state != STATE.COMPLETE) ?
                             <div>
                                 <br />
                                 <label htmlFor="todo"></label>
@@ -150,8 +178,8 @@ export default function TodoList() {
                                     value={description}
                                     placeholder="New description"
                                     required />
-                                <button onClick={() => { editDescriptionTodo(todo.id); }}>
-                                    Change description
+                                <button className='button-action' onClick={() => { editDescriptionTodo(todo.id); }}>
+                                    Confirm
                                 </button>
                             </div> : null}
                         <br />
@@ -163,7 +191,10 @@ export default function TodoList() {
             <div>
                 <input type="checkbox" id="hide" name="hide"
                     checked={hidden}
-                    onClick={() => setHidden(!hidden)} />
+                    onChange={() => {
+                        setHidden(!hidden)
+                        localStorage.setItem("hidden", "" + !hidden);
+                    }} />
                 <label htmlFor="hide">Hide completed</label>
             </div>
         </div>
