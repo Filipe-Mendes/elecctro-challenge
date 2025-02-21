@@ -2,6 +2,7 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  padding: 0;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -18,13 +19,13 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
 
 body {
   margin: 0;
-  display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -41,8 +42,9 @@ h2 {
 
 
 button {
-  border-radius: 100px;
-  border: 1px solid ;
+  margin: 2px;
+  border-radius: 50px;
+  border: 1px solid;
   border-color: black;
   padding: 0.6em 1.2em;
   font-size: 1em;
@@ -51,20 +53,24 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
 
-}
 .button-delete {
-  background-color:#c43630;
+  background-color: #c43630;
 }
+
 .button-action {
-  background-color:#3d84c2;
+  background-color: #3d84c2;
 }
+
 .button-edit {
-  background-color:#eb971e;
+  background-color: #eb971e;
 }
+
 button:hover {
   border-color: white;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -75,30 +81,24 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
-/*   button {
-    background-color: #f9f9f9;
-  } */
 }
 
 
-/* Customize the label (the container) */
 .container {
   display: block;
   position: relative;
   padding-left: 35px;
-  margin-bottom: 12px;
+  margin-bottom: 22px;
   cursor: pointer;
-  font-size: 22px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  font-size: 16px;
+  font-weight: bold;
+
 }
 
-/* Hide the browser's default checkbox */
 .container input {
   position: absolute;
   opacity: 0;
@@ -107,7 +107,6 @@ button:focus-visible {
   width: 0;
 }
 
-/* Create a custom checkbox */
 .checkmark {
   position: absolute;
   top: 0;
@@ -115,31 +114,30 @@ button:focus-visible {
   height: 25px;
   width: 25px;
   background-color: #eee;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #242424;
 }
 
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
+.container:hover input~.checkmark {
   background-color: #ccc;
 }
 
-/* When the checkbox is checked, add a blue background */
-.container input:checked ~ .checkmark {
+.container input:checked~.checkmark {
   background-color: #09a52d;
 }
 
-/* Create the checkmark/indicator (hidden when not checked) */
 .checkmark:after {
   content: "";
   position: absolute;
   display: none;
 }
 
-/* Show the checkmark when checked */
-.container input:checked ~ .checkmark:after {
+.container input:checked~.checkmark:after {
   display: block;
 }
 
-/* Style the checkmark/indicator */
 .container .checkmark:after {
   left: 9px;
   top: 5px;
@@ -147,7 +145,56 @@ button:focus-visible {
   height: 10px;
   border: solid white;
   border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+
+.header {
+  background-color: lightgrey;
+  padding: 10px 20px;
+  color: #242424;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+}
+
+.textinput {
+  width: 100%;
+  max-width: 250px;
+  padding: 12px 15px;
+  border: none;
+  border-bottom: 2px solid #007bff;
+  background-color: transparent;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+}
+
+.textinput:focus {
+  border-bottom: 2px solid #ff5733;
+}
+
+.legend {
+  font-size: 14px;
+  margin: 0px;
+}
+
+.minor-title {
+  margin-bottom: 0px;
+}
+
+.tasks {
+  margin: 30px;
+}
+
+.task {
+  margin: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.description {
+  margin-left: 20px;
+  margin-right: 20px;
 }

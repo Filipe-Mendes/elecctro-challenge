@@ -7,9 +7,6 @@ export default function TodoForm() {
     const [description, setDescription] = useState('');
 
     const { todo, setTodo } = useContext(TodoContext);
-    const [newTodo, setNewTodo] = useState('');
-
-    
 
     async function createTodo(event) {
         event.preventDefault();
@@ -24,22 +21,22 @@ export default function TodoForm() {
             setTodo([res])
         } catch (error) {
             alert('Failed to create todo');
+            console.log(error)
         }
     }
 
     return (
         <div>
-            <form onSubmit={createTodo}>
-                <label htmlFor="todo"></label>
-                <input type="text"
-                    id="description"
-                    name="description"
-                    onChange={(e) => setDescription(e.target.value)}
-                    value={description}
-                    placeholder="Write new task here..."
-                    required />
-                <input type="submit" value="Create" />
-            </form>
+            <input className='textinput'
+                type="text"
+                id="description"
+                name="description"
+                onChange={(e) => setDescription(e.target.value)}
+                value={description}
+                placeholder="Write new task here..."
+                required />
+            <button className="button-action" onClick={createTodo} type="submit"> Create
+            </button>
             <br />
         </div>
     );
