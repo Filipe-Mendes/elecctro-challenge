@@ -53,6 +53,15 @@ const patchTodo = async function (request, reply) {
         return reply.response({ error: 'To-do list is not INCOMPLETE, description cannot be changed' }).code(HTTP_STATUS_CODE.BAD_REQUEST);
     }
 
+    if (body.state) {
+        if (body.state === STATE.COMPLETE) {
+            body.completedAt = new Date().toISOString();
+        }
+        else if (body.state === STATE.INCOMPLETE) {
+            body.completedAt = null;
+        }
+    }
+
     const edited = await db.editTodo(id, body);
     if (edited === false) {
         reply.response({ error: 'Error editing to-do list' }).code(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR);

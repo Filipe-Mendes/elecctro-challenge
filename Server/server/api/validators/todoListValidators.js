@@ -39,7 +39,7 @@ const queryGetTodos = Joi.object({
     orderBy: orderByJoi
 });
 
-//PAYLOAD
+//RESPONSE
 const responseGetTodos = Joi.array().items(
     Joi.object({
         id: idJoi.required(),
