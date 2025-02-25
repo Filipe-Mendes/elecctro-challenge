@@ -1,16 +1,15 @@
 import knexConnection from './dbConnection.js';
 
-const readTodo = async function (id) {
+const readTodo = async function (tid, usern) {
 
     try {
-        const todoList = await knexConnection.select('*')
+        const todoList = await knexConnection.select('id', 'state', 'description', 'createdAt', 'completedAt')
             .from('todo')
-            .where('id', id);
+            .where({ id: tid, username: usern });
         if (todoList.length === 0) {
             return null;
         }
 
-        delete todoList[0].username;
         return todoList[0];
     }
     catch (err) {
@@ -19,16 +18,16 @@ const readTodo = async function (id) {
     }
 };
 
-const readTodos = async function (filter, orderBy) {
+const readTodos = async function (filter, orderBy, username) {
 
     try {
 
-        const todoLists = await knexConnection.select('*')
+        const todoLists = await knexConnection.select('id','state', 'description', 'createdAt', 'completedAt')
             .from('todo')
+            .where('username', username)
             .whereIn('state', filter)
             .orderBy(orderBy);
 
-        todoLists.forEach((todo) => delete todo.username);
         return todoLists;
     }
     catch (err) {
@@ -53,12 +52,12 @@ const createTodo = async function (todo) {
     }
 };
 
-const editTodo = async function (id, body) {
+const editTodo = async function (tid, body, usern) {
 
     try {
         const edited = await knexConnection('todo')
             .update(body)
-            .where('id', id);
+            .where({ id: tid, username: usern });
 
         if (edited === 1) {
             return true;
@@ -75,11 +74,11 @@ const editTodo = async function (id, body) {
 //RETURNS NUMBER OF ROWS DELETED
 // 1 - DELETED
 // 0 - NONE
-const deleteTodo = async function (id) {
+const deleteTodo = async function (tid, user) {
 
     try {
         const deleted = await knexConnection.from('todo')
-            .where('id', id)
+            .where({ id: tid, username: user })
             .del();
         if (deleted === 1) {
             return true;

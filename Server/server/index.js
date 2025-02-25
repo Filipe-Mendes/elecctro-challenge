@@ -1,9 +1,12 @@
 import Hapi from '@hapi/hapi';
 import Inert from '@hapi/inert';
 import Vision from '@hapi/vision';
+import Jwt from '@hapi/jwt';
 import HapiSwagger from 'hapi-swagger';
 import todoListHandlers from './api/handlers/todoListHandlers.js';
 import todoListValidators from './api/validators/todoListValidators.js';
+import authenticationHandlers from './api/handlers/authenticationHandlers.js';
+
 
 const init = async () => {
 
@@ -22,6 +25,7 @@ const init = async () => {
     await server.register([
         Inert,
         Vision,
+        Jwt,
         {
             plugin: HapiSwagger,
             options: {
@@ -33,6 +37,85 @@ const init = async () => {
             }
         }
     ]);
+
+    server.auth.strategy('jwt_auth', 'jwt', {
+        keys: process.env.HAPI_JWT_KEYS,
+        verify: {
+            aud: 'urn:audience:test',
+            iss: 'urn:issuer:test',
+            sub: false,
+            nbf: true,
+            exp: true,
+            maxAgeSec: process.env.TOKEN_EXPIRE_TIME,
+            timeSkewSec: 15
+        },
+        validate: (artifacts, request, h) => {
+
+            return {
+                isValid: true,
+                credentials: { user: artifacts.decoded.payload.user }
+            };
+        }
+    });
+
+    // AUTHENTICATION ENDPOINTS
+    server.route({
+        method: 'POST',
+        path: '/login',
+        handler: authenticationHandlers.postLogin,
+        options: {
+            description: 'Authenticate user',
+            notes: 'Receives the username and password of a user and authenticates them',
+            tags: ['api']
+        }
+    });
+
+    server.route({
+        method: 'POST',
+        path: '/logout',
+        handler: authenticationHandlers.postLogout,
+        options: {
+            description: 'Logs out a user',
+            notes: 'Invalidates the credentials of the authenticated user',
+            tags: ['api'],
+            auth: 'jwt_auth'
+        }
+    });
+
+    server.route({
+        method: 'POST',
+        path: '/users',
+        handler: authenticationHandlers.postUsers,
+        options: {
+            description: 'Creates a new account',
+            notes: 'This route should receive the user details and create a new account',
+            tags: ['api']
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/me',
+        handler: authenticationHandlers.getUser,
+        options: {
+            description: 'Get user information',
+            notes: 'Returns the details of the authenticated user',
+            tags: ['api'],
+            auth: 'jwt_auth'
+        }
+    });
+
+    server.route({
+        method: 'PATCH',
+        path: '/me',
+        handler: authenticationHandlers.patchUser,
+        options: {
+            description: 'Edits user information',
+            notes: 'This route edits the details of the authenticated user.',
+            tags: ['api'],
+            auth: 'jwt_auth'
+        }
+    });
 
     server.route({
         method: 'GET',
@@ -48,7 +131,8 @@ const init = async () => {
             response: {
                 schema: todoListValidators.responseGetTodos,
                 failAction: 'error'
-            }
+            },
+            auth: 'jwt_auth'
         }
     });
 
@@ -66,7 +150,8 @@ const init = async () => {
             response: {
                 schema: todoListValidators.responsePostTodos,
                 failAction: 'error'
-            }
+            },
+            auth: 'jwt_auth'
         }
     });
 
@@ -85,7 +170,8 @@ const init = async () => {
             response: {
                 schema: todoListValidators.responsePatchTodos,
                 failAction: 'error'
-            }
+            },
+            auth: 'jwt_auth'
         }
     });
 
@@ -103,7 +189,8 @@ const init = async () => {
             response: {
                 schema: todoListValidators.responseDeleteTodo,
                 failAction: 'error'
-            }
+            },
+            auth: 'jwt_auth'
         }
     });
 
