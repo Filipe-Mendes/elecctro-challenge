@@ -4,7 +4,8 @@ import { useContext, useEffect, useState } from 'react';
 import { Todo } from '../model/Todo.tsx';
 import STATE from '../model/state.tsx';
 import ORDER from '../model/order.tsx';
-import { TodoContext } from '../Context.tsx';
+import { TodoContext } from '../TodoContext.tsx';
+import { AuthContext } from '../AuthContext.tsx';
 
 export default function TodoList() {
     const [hidden, setHidden] = useState(false);
@@ -20,19 +21,25 @@ export default function TodoList() {
     const orderValues = Object.values(ORDER);
 
     const { todo } = useContext(TodoContext);
+    const { token } = useContext(AuthContext);
+
 
 
     async function getTodos() {
         console.log("GET TODOS")
         try {
-            const res = await axios.get(import.meta.env.VITE_API_ENDPOINT + '/todos')
+            const httpOptions = {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            }
+            const res = await axios.get(import.meta.env.VITE_API_ENDPOINT + '/todos', httpOptions)
             const resi: Todo[] = res.data.map((todo: Todo) => ({
                 id: todo.id,
                 state: todo.state,
                 description: todo.description,
                 createdAt: new Date(todo.createdAt),
                 completedAt: todo.completedAt ? new Date(todo.completedAt) : undefined
-
             }));
             setTodos(resi)
         } catch (error) {
@@ -48,9 +55,8 @@ export default function TodoList() {
 
         const o = localStorage.getItem("order")
         setOrder(o ? parseInt(o) : 0);
-
-
     }
+
     useEffect(() => {
         console.log("USE EFFECT")
         getTodos()
@@ -65,7 +71,12 @@ export default function TodoList() {
     async function deleteTodo(id: number) {
         console.log("DELETE TODO")
         try {
-            await axios.delete(`${import.meta.env.VITE_API_ENDPOINT}/todo/${id}`)
+            const httpOptions = {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            }
+            await axios.delete(`${import.meta.env.VITE_API_ENDPOINT}/todo/${id}`, httpOptions)
             getTodos()
         } catch (error) {
             alert('Failed to delete todo');
@@ -89,9 +100,14 @@ export default function TodoList() {
     async function editDescriptionTodo(id: number) {
         console.log("EDIT TODO")
         try {
+            const httpOptions = {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            }
             await axios.patch(`${import.meta.env.VITE_API_ENDPOINT}/todo/${id}`, {
                 description: description
-            })
+            }, httpOptions)
             getTodos()
         } catch (error) {
             alert('Failed to edit todo');
@@ -107,9 +123,14 @@ export default function TodoList() {
         else if (checked == STATE.INCOMPLETE) state = STATE.COMPLETE
 
         try {
+            const httpOptions = {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            }
             await axios.patch(`${import.meta.env.VITE_API_ENDPOINT}/todo/${id}`, {
                 state: state
-            })
+            }, httpOptions)
             getTodos()
         } catch (error) {
             alert('Failed to edit todo');

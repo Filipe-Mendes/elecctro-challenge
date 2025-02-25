@@ -1,21 +1,28 @@
 import { useContext, useState } from 'react'
 import axios from 'axios'
 import '../App.css'
-import { TodoContext } from '../Context';
+import { TodoContext } from '../TodoContext';
+import { AuthContext } from '../AuthContext';
 
 export default function TodoForm() {
     const [description, setDescription] = useState('');
 
     const { setTodo } = useContext(TodoContext);
+    const { token } = useContext(AuthContext);
 
     async function createTodo(event) {
         event.preventDefault();
         console.log("Form submitted!");
         //check if description empty
         try {
+            const httpOptions = {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            }
             const res = await axios.post(import.meta.env.VITE_API_ENDPOINT + '/todos', {
                 description: description
-            })
+            }, httpOptions)
             // alert('Todo created!');
             setDescription('')
             setTodo([res])

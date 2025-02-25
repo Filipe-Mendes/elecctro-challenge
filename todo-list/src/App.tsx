@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css'
 import TodoForm from './components/CreateTodo';
 import TodoList from './components/ListTodos';
-import { TodoContext, TodoContextType } from './Context';
+import { TodoContext, TodoContextType } from './TodoContext';
 import { Todo } from './model/Todo';
 import Header from './components/Header';
+import { AuthContext } from './AuthContext';
+import Authentication from './components/Authentication';
+import Logout from './components/Logout';
 
 function App() {
 
@@ -14,15 +17,38 @@ function App() {
 		setTodo: setTodo
 	}
 
+	const [token, setToken] = useState('');
+	const authCtx = {
+		token: token,
+		setToken: setToken
+	}
+
+	useEffect(() => {
+        console.log("USE EFFECT APP")
+	}, [authCtx.token])
+
 	return (
 		<>
 			<Header />
-			<h1>To-do list</h1>
-			<TodoContext.Provider value={ctx}>
-				<TodoForm />
-				<br></br>
-				<TodoList />
-			</TodoContext.Provider>
+			<AuthContext.Provider value={authCtx}>
+				{(!authCtx.token) ?
+					<div>
+						<Authentication />
+					</div>
+					:
+					<div>
+						<Logout />
+						<h1>To-do list</h1>
+						<TodoContext.Provider value={ctx}>
+							<TodoForm />
+							<br></br>
+							<TodoList />
+						</TodoContext.Provider>
+					</div>
+				}
+
+
+			</AuthContext.Provider>
 
 		</>
 	)
